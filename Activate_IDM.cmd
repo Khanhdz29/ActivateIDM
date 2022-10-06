@@ -1,8 +1,8 @@
-@setlocal DisableDelayedExpansion
+@setlocal disableDelayedExpansion
 @echo off
 
-:: Add custom name in IDM license info, prefer to write it in English and/or numeric in below line after = sign,
-set name=
+:: Thay doi ten cho giay phep, viet Tieng Anh hoac Tieng Viet khong dau.
+set name=khanhdz
 
 
 
@@ -14,7 +14,7 @@ set name=
 
 if exist %SystemRoot%\Sysnative\cmd.exe (
 set "_cmdf=%~f0"
-setlocal EnableDelayedExpansion
+setlocal enableDelayedExpansion
 start %SystemRoot%\Sysnative\cmd.exe /c ""!_cmdf!" %*"
 exit /b
 )
@@ -23,7 +23,7 @@ exit /b
 
 if exist %SystemRoot%\Windows\SyChpe32\kernel32.dll if exist %SystemRoot%\SysArm32\cmd.exe if %PROCESSOR_ARCHITECTURE%==AMD64 (
 set "_cmdf=%~f0"
-setlocal EnableDelayedExpansion
+setlocal enableDelayedExpansion
 start %SystemRoot%\SysArm32\cmd.exe /c ""!_cmdf!" %*"
 exit /b
 )
@@ -62,7 +62,7 @@ set "_psc=%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe"
 set winbuild=1
 for /f "tokens=6 delims=[]. " %%G in ('ver') do set winbuild=%%G
 call :_colorprep
-set "nceline=echo: &echo ==== ERROR ==== &echo:"
+set "nceline=echo: &echo ==== LOI ==== &echo:"
 set "line=________________________________________________________________________________________"
 set "_buf={$W=$Host.UI.RawUI.WindowSize;$B=$Host.UI.RawUI.BufferSize;$W.Height=31;$B.Height=300;$Host.UI.RawUI.WindowSize=$W;$Host.UI.RawUI.BufferSize=$B;}"
 
@@ -75,15 +75,15 @@ if defined Silent call :begin %nul% & exit /b
 
 if not exist "%_psc%" (
 %nceline%
-echo Powershell is not installed in the system.
-echo Aborting...
+echo Powershell chua duoc cai dat trong he thong.
+echo Dang huy bo...
 goto done2
 )
 
 if %winbuild% LSS 7600 (
 %nceline%
-echo Unsupported OS version Detected.
-echo Project is supported only for Windows 7/8/8.1/10/11 and their Server equivalent.
+echo Phien ban he dieu hanh khong ho tro.
+echo Du an chi ho tro cho Windows 7/8/8.1/10/11 va cac phien ban Servers cua chung.
 goto done2
 )
 
@@ -103,7 +103,7 @@ set _PSarg="""%~f0""" -el %_args%
 set "_appdata=%appdata%"
 for /f "tokens=2*" %%a in ('reg query "HKCU\Software\DownloadManager" /v ExePath 2^>nul') do call set "IDMan=%%b"
 
-setlocal EnableDelayedExpansion
+setlocal enableDelayedExpansion
 
 ::========================================================================================================================================
 
@@ -113,8 +113,8 @@ setlocal EnableDelayedExpansion
 %nul% reg query HKU\S-1-5-19 || (
 if not defined _elev %nul% %_psc% "start cmd.exe -arg '/c \"!_PSarg:'=''!\"' -verb runas" && exit /b
 %nceline%
-echo This script require administrator privileges.
-echo To do so, right click on this script and select 'Run as administrator'.
+echo Tap lenh yeu cau quyen admin.
+echo De lam vay, hay nhap chuot phai len tap lenh va chon  'Run as administrator'.
 goto done2
 )
 
@@ -153,7 +153,7 @@ if defined activate goto _activate
 :MainMenu
 
 cls
-title  IAS 0.7  ^(Tool Activate IDM viet hoa Khanhdz^)
+title  IAS 0.7 ^Viet Hoa boi Khanhdz
 mode 65, 25
 
 :: Check firewall status
@@ -161,45 +161,45 @@ mode 65, 25
 set /a _ena=0
 set /a _dis=0
 for %%# in (DomainProfile PublicProfile StandardProfile) do (
-for /f "skip=2 tokens=2*" %%a in ('reg query HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\%%# /v EnableFirewall 2^>nul') do (
+for /f "skip=2 tokens=2*" %%a in ('reg query HKLM\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\%%# /v enableFirewall 2^>nul') do (
 if /i %%b equ 0x1 (set /a _ena+=1) else (set /a _dis+=1)
 )
 )
 
 if %_ena%==3 (
-set _status=Enabled
+set _status=BAT
 set _col=%_Green%
 )
 
 if %_dis%==3 (
-set _status=Disabled
+set _status=TAT
 set _col=%_Red%
 )
 
 if not %_ena%==3 if not %_dis%==3 (
-set _status=Status_Unclear
+set _status=Khong xac dinh
 set _col=%_Yellow%
 )
 
 echo:
 echo:
 echo:
-echo:
+call :_color2 %_White% "                      " %_Green% "Viet hoa boi Khanhdz"
 echo:       ___________________________________________________ 
 echo:                                                          
-echo:          [1] Kich hoat IDM                               
-echo:          [2] Reset dang ky IDM, trial trong Registry
+echo:          [1] Kich Hoat IDM                               
+echo:          [2] Reset Kich Hoat / Dung thu IDM trong Registry
 echo:          _____________________________________________   
 echo:                                                          
-call :_color2 %_White% "          [3] Bat/Tat Windows Firewall  " %_col% "[%_status%]"
+call :_color2 %_White% "          [3] Dieu chinh Windows Firewall  " %_col% "[%_status%]"
 echo:          _____________________________________________   
 echo:                                                          
 echo:          [4] ReadMe                                      
 echo:          [5] Trang chu                                    
-echo:          [6] Thoat                                        
+echo:          [6] Thoat                                       
 echo:       ___________________________________________________
 echo:   
-call :_color2 %_White% "        " %_Green% "Chon so ban muon roi an Enter [1,2,3,4,5,6]"
+call :_color2 %_White% "        " %_Yellow% "Nhap mot lua chon tu ban phim [1,2,3,4,5,6]"
 choice /C:123456 /N
 set _erl=%errorlevel%
 
@@ -215,7 +215,7 @@ goto :MainMenu
 
 :_tog_Firewall
 
-if %_status%==Enabled (
+if %_status%==enabled (
 netsh AdvFirewall Set AllProfiles State Off >nul
 ) else (
 netsh AdvFirewall Set AllProfiles State On >nul
@@ -268,9 +268,9 @@ echo:
 echo %line%
 echo:
 if not defined _error (
-call :_color %Green% "Da hoan thanh reset dang ky IDM, trial trong registry."
+call :_color %Green% "Thanh cong reset Kich Hoat - Dung thu IDM trong Registry."
 ) else (
-call :_color %Red% "Loi khong the reset dang ky IDM"
+call :_color %Red% "That bai Reset Kich Hoat - Dung thu IDM."
 )
 
 goto done
@@ -289,7 +289,7 @@ set _error=
 
 if not exist "!IDMan!" (
 call :_color %Red% "IDM [Internet Download Manager] chua duoc cai dat."
-echo You can download it from  https://www.internetdownloadmanager.com/download.html
+echo Ban co the tai no xuong tu  https://www.internetdownloadmanager.com/download.html
 goto done
 )
 
@@ -300,11 +300,11 @@ ping -n 1 internetdownloadmanager.com >nul || (
 )
 
 if not [%errorlevel%]==[0] (
-call :_color %Red% "Khong the ket noi toi internetdownloadmanager.com, dang huy bo..."
+call :_color %Red% "Khong the ket noi den internetdownloadmanager.com, Dang huy bo..."
 goto done
 )
 
-echo Internet is connected.
+echo Da ket noi Internet.
 
 %idmcheck% && taskkill /f /im idman.exe
 
@@ -321,7 +321,7 @@ if defined _derror call :f_reset & goto done
 
 set lockedkeys=
 set "_action=call :lock_key"
-echo Locking registry keys...
+echo Khoa cac Key registry...
 echo:
 call :action
 
@@ -329,9 +329,9 @@ if not defined _error if [%lockedkeys%] GEQ [7] (
 echo:
 echo %line%
 echo:
-call :_color %Green% "IDM duoc kich hoat thanh cong"
+call :_color %Green% "IDM da duoc kich hoat thanh cong."
 echo:
-call :_color %Gray% "Neu hop thoai fake serials hien len, chay lai file nay!!"
+call :_color %Gray% "Neu xuat hien thong bao fake serial, hay chay lua chon Kich Hoat lai, sau do no se khong thong bao nua.
 goto done
 )
 
@@ -349,7 +349,7 @@ timeout /t 3
 exit /b
 )
 
-call :_color %_Yellow% "An bat ki nut nao de quay lai..."
+call :_color %_Yellow% "Nhan phim bat ki de quay lai..."
 pause >nul
 goto MainMenu
 
@@ -360,7 +360,7 @@ timeout /t 3
 exit /b
 )
 
-echo An bat ky nut nao de thoat...
+echo Nhan phim bat ki de thoat...
 pause >nul
 exit /b
 
@@ -371,7 +371,7 @@ exit /b
 cls
 echo:
 echo:
-echo Login is required.
+echo Can phai Dang Nhap.
 echo:
 echo:
 timeout /t 3
@@ -386,13 +386,13 @@ goto MainMenu
 echo:
 echo %line%
 echo:
-call :_color %Red% "Co loi khi reset dang ky..."
+call :_color %Red% "Phat hien loi, dang reset Kich hoat IDM..."
 set "_action=call :delete_key"
 call :reset
 echo:
 echo %line%
 echo:
-call :_color %Red% "Kich hoat IDM khong thanh cong."
+call :_color %Red% "Kich hoat IDM that bai."
 exit /b
 
 ::========================================================================================================================================
@@ -417,18 +417,18 @@ exit /b
 :register_IDM
 
 echo:
-echo Applying registration details...
+echo Ap dung cac thong tin dang ki...
 echo:
 
-If not defined name set name=Khanhdzbodoi
+If not defined name set name=Tonec FZE
 
-set "reg=HKCU\SOFTWARE\DownloadManager /v FName /t REG_SZ /d "Khanhdzbodoi"" & call :_rcont
+set "reg=HKCU\SOFTWARE\DownloadManager /v FName /t REG_SZ /d "%name%"" & call :_rcont
 set "reg=HKCU\SOFTWARE\DownloadManager /v LName /t REG_SZ /d """ & call :_rcont
-set "reg=HKCU\SOFTWARE\DownloadManager /v Email /t REG_SZ /d "info@tonec.com"" & call :_rcont
-set "reg=HKCU\SOFTWARE\DownloadManager /v Serial /t REG_SZ /d "FOX6H-3KWH4-7TSIN-Q4US7"" & call :_rcont
+set "reg=HKCU\SOFTWARE\DownloadManager /v Email /t REG_SZ /d "khanhdz@flashvpn.xyz"" & call :_rcont
+set "reg=HKCU\SOFTWARE\DownloadManager /v Serial /t REG_SZ /d "KHANH-DZWH4-7TSIN-Q4US7"" & call :_rcont
 
 echo:
-echo Triggering a few downloads to create certain registry keys, please wait...
+echo Thuc hien mot vai tai xuong de tao cac key Registry, vui long cho...
 
 set "file=%_temp%\temp.png"
 set _fileexist=
@@ -463,11 +463,11 @@ if not [%foundkeys%] GEQ [7] set _derror=1
 
 echo:
 if not defined _derror (
-echo Required registry keys were created successfully.
+echo Cac key Registry can thiet da duoc tao thanh cong.
 ) else (
-if not defined _fileexist call :_color %Red% "Khong the tai file voi IDM"
-call :_color %Red% "Failed to create required registry keys."
-call :_color %Magenta% "Tat Window Defender và Firewall roi chay lai - xem Read Me."
+if not defined _fileexist call :_color %Red% "Khong the tai xuong tap tin voi IDM."
+call :_color %Red% "That bai tao cac key Registry can thiet."
+call :_color %Magenta% "Thu lai - tat Windows firewall voi lua chon trong tap lenh - Xem Read Me."
 )
 
 echo:
@@ -494,7 +494,7 @@ goto :Check_file
 :delete_queue
 
 echo:
-echo Deleting registry keys...
+echo Dang xoa cac key registry...
 echo:
 
 for %%# in (
@@ -520,10 +520,10 @@ exit /b
 :add_key
 
 echo:
-echo Adding registry key...
+echo Dang them cac key registry...
 echo:
 
-set "reg="%HKLM%" /v "AdvIntDriverEnabled2""
+set "reg="%HKLM%" /v "AdvIntDriverenabled2""
 
 reg add %reg% /t REG_DWORD /d "1" /f %nul%
 
@@ -535,7 +535,7 @@ echo Added - !reg!
 ) else (
 set _error=1
 set "reg=%reg:"=%"
-%_psc% write-host 'Failed' -fore 'white' -back 'DarkRed'  -NoNewline&echo  - !reg!
+%_psc% write-host 'That bai' -fore 'white' -back 'DarkRed'  -NoNewline&echo  - !reg!
 )
 exit /b
 
@@ -609,7 +609,7 @@ echo Deleted - !reg!
 ) else (
 set "reg=%reg:"=%"
 set _error=1
-%_psc% write-host 'Failed' -fore 'white' -back 'DarkRed'  -NoNewline & echo  - !reg!
+%_psc% write-host 'That bai' -fore 'white' -back 'DarkRed'  -NoNewline & echo  - !reg!
 )
 
 exit /b
@@ -629,7 +629,7 @@ set /a lockedkeys+=1
 ) else (
 set _error=1
 set "reg=%reg:"=%"
-%_psc% write-host 'Failed' -fore 'white' -back 'DarkRed'  -NoNewline&echo  - !reg!
+%_psc% write-host 'That bai' -fore 'white' -back 'DarkRed'  -NoNewline&echo  - !reg!
 )
 
 exit /b
@@ -704,19 +704,19 @@ exit /b
 
 :_batcol
 
-setlocal EnableDelayedExpansion
+setlocal enableDelayedExpansion
 set "s=!%~2!"
 set "t=!%~4!"
 for /f delims^=^ eol^= %%i in ("!s!") do (
-  if "!" equ "" setlocal DisableDelayedExpansion
+  if "!" equ "" setlocal TATelayedExpansion
     >`.txt (echo %%i\..\')
     findstr /a:%~1 /f:`.txt "."
     <nul set /p "=%_BS%%_BS%%_BS%%_BS%%_BS%%_BS%%_BS%"
 )
 if "%~4"=="" echo(&exit /b
-setlocal EnableDelayedExpansion
+setlocal enableDelayedExpansion
 for /f delims^=^ eol^= %%i in ("!t!") do (
-  if "!" equ "" setlocal DisableDelayedExpansion
+  if "!" equ "" setlocal TATelayedExpansion
     >`.txt (echo %%i\..\')
     findstr /a:%~3 /f:`.txt "."
     <nul set /p "=%_BS%%_BS%%_BS%%_BS%%_BS%%_BS%%_BS%"
@@ -800,7 +800,7 @@ _________________________________
    OS requirement:
 _________________________________
 
- - Project is supported only for Windows 7/8/8.1/10/11 and their Server equivalent.
+ - Du an chi ho tro cho Windows 7/8/8.1/10/11 va cac phien ban Servers cua chung.
 
 _________________________________
 
@@ -825,14 +825,14 @@ _________________________________
  - Troubleshooting steps:
 _________________________________
 
-   - If any other activator was used to activate IDM previously then make sure to properly
+   - If any other activator was used to Kich Hoat IDMpreviously then make sure to properly
      uninstall it with that same activator (if there is an option), this is especially important
      if any registry / firewall block method was used.
 
    - Uninstall the IDM from control panel.
 
    - Make sure the latest original IDM setup is used for the installation,
-     you can download it from https://www.internetdownloadmanager.com/download.html
+     Ban co the tai no xuong tu https://www.internetdownloadmanager.com/download.html
 
    - Now install the IDM and use the activate option in this script and if failed then,
 
@@ -863,7 +863,7 @@ ________________________________________________________________________________
 
    @dbenham            - Set buffer height independently of window height
                          stackoverflow.com/a/13351373
-   @khanhdz            - Translator with IDM Activation Script
+
 _________________________________
 
    IDM Activation Script
